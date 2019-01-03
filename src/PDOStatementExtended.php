@@ -29,8 +29,10 @@ class PDOStatementExtended extends PDOStatement
         $pdoInstance->setAttribute(PDO::ATTR_STATEMENT_CLASS, [static::class, [$pdoInstance]]);
     }
 
+    private $createStacktrace;
     protected function __construct(PDO $pdoInstance)
     {
+        $this->createStacktrace = debug_backtrace();
         $this->instance = $pdoInstance;
     }
 
@@ -60,7 +62,8 @@ class PDOStatementExtended extends PDOStatement
             'elapsed' => $elapsed,
             'errors' => $errors,
             'affectedRows' => $affectedRows,
-            'stacktrace' => debug_backtrace()
+            'stacktrace' => debug_backtrace(),
+            'createStacktrace' => $this->createStacktrace
         ];
         self::$executes[] = $data;
     }
