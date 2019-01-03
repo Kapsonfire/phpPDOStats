@@ -32,7 +32,7 @@ class PDOStatementExtended extends PDOStatement
     private $createStacktrace;
     protected function __construct(PDO $pdoInstance)
     {
-        $this->createStacktrace = debug_backtrace();
+        $this->createStacktrace = array_slice(debug_backtrace(), 1); // really we dont need this stack
         $this->instance = $pdoInstance;
     }
 
@@ -62,7 +62,7 @@ class PDOStatementExtended extends PDOStatement
             'elapsed' => $elapsed,
             'errors' => $errors,
             'affectedRows' => $affectedRows,
-            'stacktrace' => debug_backtrace(),
+            'stacktrace' => array_slice(debug_backtrace(),1), //we dont need this stack
             'createStacktrace' => $this->createStacktrace
         ];
         self::$executes[] = $data;
