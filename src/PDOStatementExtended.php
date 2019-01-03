@@ -29,7 +29,7 @@ class PDOStatementExtended extends PDOStatement
         $pdoInstance->setAttribute(PDO::ATTR_STATEMENT_CLASS, [static::class, [$pdoInstance]]);
     }
 
-    public function __construct(PDO $pdoInstance)
+    protected function __construct(PDO $pdoInstance)
     {
         $this->instance = $pdoInstance;
     }
