@@ -16,7 +16,7 @@
             "type": "package",
             "package": {
                 "name": "kapsonfire/phppdostats",
-                "version": "dev-master",
+                "version": "1.0",
                 "source": {
                     "url": "git://github.com/Kapsonfire/phpPDOStats.git",
                     "type": "git",
