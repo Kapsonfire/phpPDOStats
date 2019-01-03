@@ -21,13 +21,13 @@
                     "url": "git://github.com/Kapsonfire/phpPDOStats.git",
                     "type": "git",
                     "reference": "master"
-                },
-                "autoload": {
-                    "psr-4" : {
-                        "PHPPDOStats\\" : "src"
-                    }
                 }
             }
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4" : {
+            "PHPPDOStats\\" : "src"
+        }
+    }
 }
