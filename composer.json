@@ -15,7 +15,7 @@
         {
             "type": "package",
             "package": {
-                "name": "weaverryan/derp-dangerzone",
+                "name": "kapsonfire/phppdostats",
                 "version": "dev-master",
                 "source": {
                     "url": "git://github.com/Kapsonfire/phpPDOStats.git",
@@ -24,10 +24,10 @@
                 },
                 "autoload": {
                     "psr-0" : {
-                        "Weaverryan\\DangerZone" : "src"
+                        "PHPPDOStats\\" : "src"
                     }
                 }
             }
         }
-    ],
+    ]
 }
