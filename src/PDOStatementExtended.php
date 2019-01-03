@@ -59,7 +59,8 @@ class PDOStatementExtended extends PDOStatement
             'query' => $query,
             'elapsed' => $elapsed,
             'errors' => $errors,
-            'affectedRows' => $affectedRows
+            'affectedRows' => $affectedRows,
+            'stacktrace' => debug_backtrace()
         ];
         self::$executes[] = $data;
     }
