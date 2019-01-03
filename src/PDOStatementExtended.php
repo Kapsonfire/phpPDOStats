@@ -99,16 +99,18 @@ class PDOStatementExtended extends PDOStatement
 
     private function prepareParam($param)
     {
-        if ($this->instance instanceof PDO) {
-            return $this->instance->quote($param['value'], $param['type']);
-        }
-
         if ($param['value'] == null) {
             return 'NULL';
         }
         if ($param['type'] === PDO::PARAM_INT) {
-            return intval($param['value'], 10);
+            return (int) $param['value'];
         }
+
+        if ($this->instance instanceof PDO) {
+            return $this->instance->quote($param['value'], $param['type']);
+        }
+
+
 
         return "'" . addslashes($param['value']) . "'";
 
