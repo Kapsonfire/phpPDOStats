@@ -12,32 +12,6 @@
     "require": {
         "php"     : ">=7.2.0"
     },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "kapsonfire/phppdostats",
-                "version": "dev-master",
-                "source": {
-                    "url": "git://github.com/Kapsonfire/phpPDOStats.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "kapsonfire/phppdostats",
-                "version": "1.0.0",
-                "source": {
-                    "url": "git://github.com/Kapsonfire/phpPDOStats.git",
-                    "type": "git",
-                    "reference": "1.0.0"
-                }
-            }
-        }
-    ],
     "autoload": {
         "psr-4" : {
             "PHPPDOStats\\" : "src"
