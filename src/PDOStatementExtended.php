@@ -8,10 +8,13 @@ use PDOStatement;
 class PDOStatementExtended extends PDOStatement
 {
 
+    /**
+     * @var array Storage to save all executed data
+     */
     private static $executes = [];
 
     /**
-     * @var PDO
+     * @var PDO saved PDO Instance for driver basedc escaping sequences
      */
     private $instance;
 
@@ -22,14 +25,19 @@ class PDOStatementExtended extends PDOStatement
 
 
     /**
-     * @param PDO $pdoInstance
+     * @param PDO $pdoInstance - set this class for PDO::ATTR_STATEMENT_CLASS
      */
     public static function init(PDO $pdoInstance)
     {
         $pdoInstance->setAttribute(PDO::ATTR_STATEMENT_CLASS, [static::class, [$pdoInstance]]);
     }
 
+    /**
+     * @var array save the stacktrace where this statement has ben created
+     */
     private $createStacktrace;
+
+
     protected function __construct(PDO $pdoInstance)
     {
         $this->createStacktrace = array_slice(debug_backtrace(), 1); // really we dont need this stack
@@ -37,6 +45,7 @@ class PDOStatementExtended extends PDOStatement
     }
 
     /**
+     * get all execute stats
      * @return array
      */
     public static function getExecutes(): array
@@ -44,6 +53,11 @@ class PDOStatementExtended extends PDOStatement
         return self::$executes;
     }
 
+    /**
+     * @param null $input_parameters
+     * @return bool|void
+     * @see PDOStatement::execute()
+     */
     public function execute($input_parameters = null)
     {
         $start = microtime(true);
@@ -54,11 +68,19 @@ class PDOStatementExtended extends PDOStatement
     }
 
 
+    /**
+     * save the execute stats to array
+     * @param string $query
+     * @param float $elapsed
+     * @param array $errors
+     * @param int $affectedRows
+     */
     private function addExecuteData(string $query, float $elapsed, array $errors, int $affectedRows)
     {
         $data = [
             'created' => microtime(true),
             'query' => $query,
+            'originalQuery' => $this->queryString,
             'elapsed' => $elapsed,
             'errors' => $errors,
             'affectedRows' => $affectedRows,
@@ -66,8 +88,22 @@ class PDOStatementExtended extends PDOStatement
             'createStacktrace' => $this->createStacktrace
         ];
         self::$executes[] = $data;
+        if($this->getLongQueryTime() <= $elapsed) {
+            foreach($this->longQueryCallbacks as $callable) {
+                call_user_func_array($callable, [$data]);
+            }
+        }
     }
 
+    /**
+     * @param mixed $parameter
+     * @param mixed $variable
+     * @param int $data_type
+     * @param null $length
+     * @param null $driver_options
+     * @return bool
+     * @see PDOStatement::bindParam()
+     */
     public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
     {
         $this->boundParams[$parameter] = [
@@ -77,6 +113,13 @@ class PDOStatementExtended extends PDOStatement
         return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
     }
 
+    /**
+     * @param mixed $parameter
+     * @param mixed $value
+     * @param int $data_type
+     * @return bool
+     * @see PDOStatement::bindValue()
+     */
     public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
     {
         $this->boundParams[$parameter] = [
@@ -88,11 +131,12 @@ class PDOStatementExtended extends PDOStatement
 
 
     /**
-     * @var String null
+     * @var String null - the query which has been sent
      */
     private $_sendString = '';
 
     /**
+     * get the query which has been sent
      * @return String
      */
     public function getSendString(): String
@@ -100,7 +144,30 @@ class PDOStatementExtended extends PDOStatement
         return $this->_sendString;
     }
 
+    /**
+     * Gets the value for the longquerytime - if query execute time exceeds this, all longquerytimecallbacks are called
+     * @return float
+     */
+    public function getLongQueryTime(): float
+    {
+        return $this->longQueryTime;
+    }
 
+    /**
+     * sets the value for the longquerytime - if query execute time exceeds this, all longquerytimecallbacks are called
+     * @param float $longQueryTime
+     */
+    public function setLongQueryTime(float $longQueryTime)
+    {
+        $this->longQueryTime = $longQueryTime;
+    }
+
+
+    /**
+     * get the correct escaped value for the param
+     * @param $param
+     * @return int|string
+     */
     private function prepareParam($param)
     {
         if ($param['value'] == null) {
@@ -121,6 +188,13 @@ class PDOStatementExtended extends PDOStatement
 
     }
 
+    /**
+     * replaces the placeholder inside the query
+     * @param string $queryString
+     * @param string $replaceKey
+     * @param string $replaceValue
+     * @return string
+     */
     private function replaceMarker(string $queryString, string $replaceKey, string $replaceValue)
     {
 
@@ -139,9 +213,12 @@ class PDOStatementExtended extends PDOStatement
         return strtr($interpolatedString, array_flip($cleanBackRefCharMap));
     }
 
+
+    /**
+     * query has been sent, save the sent query
+     */
     public function setSendString()
     {
-
         $query = $this->queryString;
         $params = $this->boundParams;
         uksort($params, function ($b, $a) {
@@ -157,5 +234,15 @@ class PDOStatementExtended extends PDOStatement
         $this->_sendString = $query;
     }
 
+    private $longQueryCallbacks = [];
+    private $longQueryTime = 0.01;
+
+    /**
+     * callbacks are called if query execute time exceeds longQueryTime
+     * @param callable $func
+     */
+    public function addLongQueryCallback(callable $func) {
+        $this->longQueryCallbacks[] = $func;
+    }
 
 }
