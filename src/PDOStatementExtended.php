@@ -89,7 +89,7 @@ class PDOStatementExtended extends PDOStatement
         ];
         self::$executes[] = $data;
         if($this->getLongQueryTime() <= $elapsed) {
-            foreach($this->longQueryCallbacks as $callable) {
+            foreach(self::$longQueryCallbacks as $callable) {
                 call_user_func_array($callable, [$data]);
             }
         }
