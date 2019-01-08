@@ -1,4 +1,5 @@
 {
+    "version": "1.0.0",
     "name": "kapsonfire/phppdostats",
     "description": "Extends PDOStatement to give more data like sent queries, elapsed time per query and so on",
     "license": "Apache-2.0",
@@ -11,20 +12,6 @@
     "require": {
         "php"     : ">=7.2.0"
     },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "kapsonfire/phppdostats",
-                "version": "dev-master",
-                "source": {
-                    "url": "git://github.com/Kapsonfire/phpPDOStats.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
-        }
-    ],
     "autoload": {
         "psr-4" : {
             "PHPPDOStats\\" : "src"
