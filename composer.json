@@ -1,5 +1,4 @@
 {
-    "version": "1.0.1",
     "name": "kapsonfire/phppdostats",
     "description": "Extends PDOStatement to give more data like sent queries, elapsed time per query and so on",
     "license": "Apache-2.0",
